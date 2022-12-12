@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\MicroPost;
+use App\Form\MicroPostType;
 use App\Repository\MicroPostRepository;
 use DateTime;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,18 +30,42 @@ class MicroPostController extends AbstractController
     }
 
     #[Route('/micro-post/add' , name: 'app_micro_post_add' , priority: 2)]
-    public function add(Request $request , MicroPostRepository $posts) : Response {
-        $microPost= new MicroPost();
-        $form= $this->createFormBuilder($microPost)
-        ->add('title')
-        ->add('text')
-        ->add('submit' , SubmitType::class, ['label' => 'save'] )
-        ->getForm();
+    public function add(Request $request , MicroPostRepository $posts) : Response 
+    {
+        
+        $form=$this->createForm(MicroPostType::class , new MicroPost());
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $post = $form -> getData();
             $post->setCreated(new DateTime());
             $posts->add($post, true);
+
+            $this->addFlash('success', 'Added!');
+
+            return $this->redirectToRoute('app_micro_post');
+            
+        }
+        return $this->renderForm(
+            'micro_post/add.html.twig',
+            [
+                'form'=> $form
+            ]
+            );
+
+    }
+
+    #[Route('/micro-post/{post}/edit' , name: 'app_micro_post_edit')]
+    public function edit(MicroPost $post, Request $request , MicroPostRepository $posts) : Response 
+    {
+        $form= $this->createForm(MicroPostType::class , $post);
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            $post = $form -> getData();
+            $posts->add($post, true);
+
+            $this->addFlash('success', 'Updated!');
+
+            return $this->redirectToRoute('app_micro_post');
             
         }
         return $this->renderForm(

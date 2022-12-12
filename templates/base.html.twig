@@ -14,6 +14,16 @@
         {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+     <h1>All posts</h1>
+      {% for message in app.flashes('success')  %}
+                <div style="color: green">
+                {{message}}
+                </div>
+
+            {% endfor %}
+        {% block body %}
+           
+           
+        {% endblock %}
     </body>
 </html>
