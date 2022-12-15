@@ -8,7 +8,6 @@ use App\Repository\MicroPostRepository;
 use DateTime;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -69,7 +68,7 @@ class MicroPostController extends AbstractController
             
         }
         return $this->renderForm(
-            'micro_post/add.html.twig',
+            'micro_post/edit.html.twig',
             [
                 'form'=> $form
             ]
