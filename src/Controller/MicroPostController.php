@@ -2,14 +2,20 @@
 
 namespace App\Controller;
 
-use App\Entity\MicroPost;
-use App\Form\MicroPostType;
-use App\Repository\MicroPostRepository;
+use App\Entity\Comment;
 use DateTime;
+use App\Entity\User;
+use App\Entity\MicroPost;
+use App\Form\CommentType;
+use App\Entity\UserProfile;
+use App\Form\MicroPostType;
+use App\Repository\CommentRepository;
+use App\Repository\MicroPostRepository;
+use App\Repository\UserProfileRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 
 class MicroPostController extends AbstractController
 {
@@ -17,7 +23,7 @@ class MicroPostController extends AbstractController
     public function index(MicroPostRepository $posts): Response
     {
         return $this->render('micro_post/index.html.twig', [
-            'posts' => $posts->findAll()
+            'posts' => $posts->findAllWithComments()
         ]);
     }
     #[Route('micro-post/{post}' , name : 'app_micro_post_show')]
@@ -71,6 +77,49 @@ class MicroPostController extends AbstractController
             'micro_post/edit.html.twig',
             [
                 'form'=> $form
+            ]
+            );
+
+    }
+    #[Route('/' , name: 'app_home')]
+    public function home (UserProfileRepository $profiles) : Response
+    {
+        $user=new User();
+        $user->setEmail('email1@email.com');
+        $user->setPassword('1234567778');
+
+        $profile= new UserProfile();
+        $profile->setUser($user);
+        $profiles->save($profile, true);
+
+        return $this->render(
+            'base.html.twig'
+        );
+
+
+    }
+
+
+    #[Route('/micro-post/{post}/comment' , name: 'app_micro_post_comment')]
+    public function addComment(MicroPost $post, Request $request , CommentRepository $comments) : Response 
+    {
+        $form= $this->createForm(CommentType::class , new Comment);
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            $comment = $form -> getData();
+            $comment->setPost($post);
+            $comments->save($comment, true);
+
+            $this->addFlash('success', 'Updated!');
+
+            return $this->redirectToRoute('app_micro_post',['post' => $post->getId()]);
+            
+        }
+        return $this->renderForm(
+            'micro_post/comment.html.twig',
+            [
+                'form'=> $form,
+                'post'=> $post
             ]
             );
 

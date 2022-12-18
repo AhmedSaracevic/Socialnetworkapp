@@ -20,7 +20,8 @@
                 <span class="px-2 rounded-md bg-gray-200 dark:bg-gray-400">user@</span>
             </a>
         </div>
-        <div>
-            <a href="{{ path ('app_micro_post_edit', {post: post.id})}}">EDIT</a>
+        <div class= "flex">
+            <a href="{{ path ('app_micro_post_edit', {post: post.id})}}" class="mr-2">EDIT</a>
+            <a href="{{ path ('app_micro_post_comment', {post: post.id})}}">Comment <span class="px-2 rounded-md bg-gray-200 dark:bg-gray-400">{{post.comments.count}}</span></a>
         </div>
 </div>
